@@ -665,6 +665,22 @@
     }
     .vs-card:hover { background: var(--bg-elev); }
     .vs-self { background: linear-gradient(180deg, rgba(197,255,61,0.05), transparent 60%), var(--bg); }
+    .vs-image {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      margin-bottom: 32px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--bg-elev), var(--bg-deeper));
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .vs-image img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: contrast(1.05) saturate(0.95);
+    }
     .vs-tag {
       display: inline-block;
       font-size: 10.5px;
@@ -1012,6 +1028,9 @@
 
     <div class="vs-grid">
       <div class="vs-card vs-self">
+        <div class="vs-image">
+          <img id="vs-superstrike-img" src="https://placehold.co/800x500/0f0f12/c5ff3d/png?text=Capturing+frame…&font=raleway" alt="Logitech G Pro X2 Superstrike" />
+        </div>
         <div class="vs-tag mono">This unit</div>
         <h3 class="vs-name">Logitech G — Pro&nbsp;X2 Superstrike</h3>
         <ul class="vs-list mono">
@@ -1024,6 +1043,11 @@
         </ul>
       </div>
       <div class="vs-card">
+        <div class="vs-image">
+          <img src="https://assets3.razerzone.com/AbVEeZHzdjmXjh3QqQvwxNbUfcg=/1500x1000/https%3A%2F%2Fhybrismediaprod.blob.core.windows.net%2Fsys-master-phoenix-images-container%2Fhf2%2Fhd5%2F9636024545310%2F250513-viper-v4-pro-1500x1000-1.jpg"
+               onerror="this.onerror=null;this.src='https://placehold.co/800x500/0f0f12/eeeeee/png?text=Razer+Viper+V4+Pro&font=raleway';"
+               alt="Razer Viper V4 Pro" loading="lazy" />
+        </div>
         <div class="vs-tag mono">Competitor</div>
         <h3 class="vs-name">Razer Viper V4 Pro</h3>
         <ul class="vs-list mono">
@@ -1147,21 +1171,44 @@
       setTimeout(() => preloader.classList.add('done'), 240);
     }
 
+    // Magnetic CTA hover removed per design pass.
+
     // ─────────────────────────────────────────────────────────────────────────
-    //  Magnetic CTA hover
+    //  Capture a still frame from the mouse video for the comparison card
     // ─────────────────────────────────────────────────────────────────────────
-    document.querySelectorAll('[data-magnetic]').forEach(el => {
-      const strength = 0.35;
-      el.addEventListener('mousemove', (e) => {
-        const r = el.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top  + r.height / 2);
-        el.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+    (function captureProductFrame() {
+      const v = document.createElement('video');
+      v.src = 'Mouse_rotation_exploded_202604202134.mp4';
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = 'auto';
+      v.crossOrigin = 'anonymous';
+
+      v.addEventListener('loadeddata', () => {
+        // Seek to ~5% of duration — the assembled mouse before the explode
+        const targetT = (v.duration || 1) * 0.05;
+        try { v.currentTime = targetT; }
+        catch (e) { /* ignore */ }
       });
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = '';
-      });
-    });
+
+      v.addEventListener('seeked', () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width  = v.videoWidth  || 1280;
+          c.height = v.videoHeight || 720;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(v, 0, 0, c.width, c.height);
+          const url = c.toDataURL('image/jpeg', 0.88);
+          const img = document.getElementById('vs-superstrike-img');
+          if (img) img.src = url;
+        } catch (err) {
+          // If the canvas is tainted (CORS), the placeholder remains.
+          console.warn('Frame capture blocked:', err);
+        }
+      }, { once: true });
+
+      v.load();
+    })();
 
     // ─────────────────────────────────────────────────────────────────────────
     //  Scroll-reveal on sections (intersection observer)
@@ -1464,14 +1511,8 @@
       videoMesh.rotation.y =  tiltX;
       videoMesh.rotation.x = -tiltY;
 
-      for (let i = 0; i < badges.length; i++) {
-        const b = badges[i]; if (!b) continue;
-        const mx = badgeMul[i][0], my = badgeMul[i][1];
-        b.style.transform = `translate3d(${tiltTargX * mx}px, ${tiltTargY * -my}px, 0)`;
-      }
-
-      camera.position.x = lerp(camera.position.x, tiltTargX * 0.06, 0.025);
-      camera.position.y = lerp(camera.position.y, tiltTargY * 0.04, 0.025);
+      // Floating badges no longer follow the cursor — they sit static.
+      // Camera parallax also removed so the scene doesn't track mouse position.
 
       updatePhysics();
 
