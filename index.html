@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Atelier — Precision in Motion</title>
+  <title>Logitech G Pro X2 Superstrike — Precision in Motion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -44,7 +44,6 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      cursor: none;
       letter-spacing: -0.011em;
     }
 
@@ -519,45 +518,9 @@
       z-index: 200; pointer-events: none;
     }
 
-    /* ════════════════════════════════════════════════════════════════════════
-       CURSOR — crosshair reticle
-       ════════════════════════════════════════════════════════════════════════ */
-    #cur-dot {
-      position: fixed;
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: var(--accent);
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%,-50%);
-    }
-    #cur-ring {
-      position: fixed;
-      width: 22px; height: 22px;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%,-50%);
-      transition: width 0.22s var(--easing-default), height 0.22s var(--easing-default);
-    }
-    #cur-ring::before, #cur-ring::after {
-      content:''; position:absolute;
-      background: rgba(255,255,255,0.55);
-    }
-    #cur-ring::before {
-      left:50%; top:0;
-      width:1px; height:6px;
-      transform: translateX(-50%);
-      box-shadow: 0 16px 0 rgba(255,255,255,0.55);
-    }
-    #cur-ring::after {
-      top:50%; left:0;
-      width:6px; height:1px;
-      transform: translateY(-50%);
-      box-shadow: 16px 0 0 rgba(255,255,255,0.55);
-    }
-    body.clicking #cur-ring { width: 32px; height: 32px; }
-    body.clicking #cur-ring::before { box-shadow: 0 26px 0 var(--accent); background: var(--accent); }
-    body.clicking #cur-ring::after  { box-shadow: 26px 0 0 var(--accent); background: var(--accent); }
+    /* Cursor — system default. Custom cursor removed for clarity over the 3-D scene. */
+    body { cursor: auto; }
+    #cur-dot, #cur-ring { display: none !important; }
 
     /* ════════════════════════════════════════════════════════════════════════
        MARQUEE — infinite text scroller
@@ -686,6 +649,68 @@
       color: var(--fg-mute);
       line-height: 1.55;
     }
+
+    /* Versus comparison grid */
+    .vs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .vs-card {
+      background: var(--bg);
+      padding: 40px 36px;
+      transition: background 0.4s var(--easing-default);
+    }
+    .vs-card:hover { background: var(--bg-elev); }
+    .vs-self { background: linear-gradient(180deg, rgba(197,255,61,0.05), transparent 60%), var(--bg); }
+    .vs-tag {
+      display: inline-block;
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-bottom: 28px;
+      padding: 4px 10px;
+      border: 1px solid var(--border-str);
+      border-radius: 100px;
+    }
+    .vs-self .vs-tag {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .vs-name {
+      font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      color: var(--fg);
+      margin-bottom: 32px;
+    }
+    .vs-list { list-style: none; display: flex; flex-direction: column; }
+    .vs-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .vs-list li:last-child { border-bottom: none; }
+    .vs-list li span {
+      color: var(--fg-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .vs-list li b {
+      color: var(--fg);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      text-align: right;
+    }
+    @media (max-width: 800px) { .vs-grid { grid-template-columns: 1fr; } }
 
     /* Pull quote */
     .pull {
@@ -828,7 +853,7 @@
   <!-- ═══════════════════════ Preloader ═══════════════════════ -->
   <div id="preloader">
     <div class="pl-meta">
-      <div>Atelier / Series&nbsp;01</div>
+      <div>Logitech&nbsp;G&nbsp;/&nbsp;Pro&nbsp;X2&nbsp;Superstrike</div>
       <div style="margin-top:6px; opacity:0.55;">Initialising experience</div>
     </div>
     <div class="pl-counter mono">
@@ -853,13 +878,13 @@
   <nav id="nav">
     <div class="brand">
       <div class="mark"></div>
-      <span>Atelier&nbsp;/&nbsp;Mouse</span>
+      <span>Logitech&nbsp;G&nbsp;/&nbsp;Pro&nbsp;X2&nbsp;Superstrike</span>
     </div>
     <div class="links">
       <a href="#architecture">Architecture</a>
-      <a href="#specifications">Specifications</a>
+      <a href="#versus">Compare</a>
       <a href="#philosophy">Philosophy</a>
-      <a href="#footer">Contact</a>
+      <a href="#footer">Pre-order</a>
     </div>
     <a href="#" class="cta" data-magnetic>
       Request access
@@ -871,7 +896,7 @@
   <div id="hud">
     <div class="meta mono"><span>LAT&nbsp;<b>48.8566°N</b></span><span>LON&nbsp;<b>2.3522°E</b></span></div>
     <div class="center mono"><span>FRAME</span><div class="track"><div class="fill" id="hud-fill"></div></div><span class="pct">[<b id="hud-pct">000</b>&nbsp;/&nbsp;100]</span></div>
-    <div class="meta mono"><span>SERIES&nbsp;<b>01.A</b></span><span>REV&nbsp;<b>2026.05</b></span></div>
+    <div class="meta mono"><span>MODEL&nbsp;<b>SX2</b></span><span>REV&nbsp;<b>2026</b></span></div>
   </div>
 
   <!-- ═══════════════════════ Sticky Three.js stage ═══════════════════════ -->
@@ -905,17 +930,17 @@
       <div id="hero">
         <div id="hero-inner">
           <div class="left-col">
-            <div class="eyebrow mono">Series 01 — Atelier Edition</div>
+            <div class="eyebrow mono">Logitech G — Pro X2 Superstrike</div>
             <h1>
               <span class="reveal-mask"><span class="reveal-inner">Precision</span></span><br/>
               <span class="reveal-mask"><span class="reveal-inner">in&nbsp;<span class="accent">motion</span>.</span></span>
             </h1>
           </div>
           <div class="right-col">
-            <p class="sub">A peripheral engineered around a single principle — the disappearance of itself. Every component refined to its essential geometry. Scroll to disassemble the architecture.</p>
+            <p class="sub">A 60-gram wireless flagship built around the new <span class="serif">Hero 2</span> sensor and the Haptic Inductive Trigger System — the first user-tunable click on a competitive mouse. Scroll to disassemble.</p>
             <div class="actions">
-              <a href="#" class="btn btn-primary" data-magnetic>Reserve unit</a>
-              <a href="#architecture" class="btn btn-ghost">Read the spec</a>
+              <a href="#" class="btn btn-primary" data-magnetic>Pre-order</a>
+              <a href="#specifications" class="btn btn-ghost">View specifications</a>
             </div>
           </div>
         </div>
@@ -932,18 +957,18 @@
   <!-- ═══════════════════════ Marquee ═══════════════════════ -->
   <div class="marquee">
     <div class="marquee-track">
-      <span>Engineered in Paris</span>
-      <span class="serif">Series 01</span>
-      <span>Titanium architecture</span>
-      <span class="serif">8kHz polling</span>
-      <span>0.4ms response</span>
-      <span class="serif">By appointment</span>
-      <span>Engineered in Paris</span>
-      <span class="serif">Series 01</span>
-      <span>Titanium architecture</span>
-      <span class="serif">8kHz polling</span>
-      <span>0.4ms response</span>
-      <span class="serif">By appointment</span>
+      <span>Hero&nbsp;2 sensor</span>
+      <span class="serif">44K DPI</span>
+      <span>HITS triggers</span>
+      <span class="serif">8 kHz polling</span>
+      <span>60-gram chassis</span>
+      <span class="serif">Pre-order open</span>
+      <span>Hero&nbsp;2 sensor</span>
+      <span class="serif">44K DPI</span>
+      <span>HITS triggers</span>
+      <span class="serif">8 kHz polling</span>
+      <span>60-gram chassis</span>
+      <span class="serif">Pre-order open</span>
     </div>
   </div>
 
@@ -951,29 +976,64 @@
   <section class="section" id="architecture">
     <div class="section-head">
       <div class="section-num">(01) — Architecture</div>
-      <h2 class="section-title">Twenty-three components.<br/><span class="serif">Zero compromise.</span></h2>
+      <h2 class="section-title">A new sensor.<br/>A new <span class="serif">trigger.</span></h2>
     </div>
 
     <div class="spec-grid" id="specifications">
       <div class="spec">
-        <div class="k">Polling rate</div>
-        <div class="v">8000<span class="unit">Hz</span></div>
-        <div class="desc">Wireless transmission tuned for esports-tier responsiveness.</div>
-      </div>
-      <div class="spec">
         <div class="k">Sensor</div>
-        <div class="v">42K<span class="unit">DPI</span></div>
-        <div class="desc">Custom-tuned Pixart 3950 with 750 ips tracking.</div>
+        <div class="v">44K<span class="unit">DPI</span></div>
+        <div class="desc">Hero 2 — 888 IPS tracking, 88G acceleration. Logitech's most precise optical sensor.</div>
       </div>
       <div class="spec">
         <div class="k">Mass</div>
-        <div class="v">58<span class="unit">g</span></div>
-        <div class="desc">Forged titanium chassis, machined from a single billet.</div>
+        <div class="v">60–65<span class="unit">g</span></div>
+        <div class="desc">Lightweight wireless chassis tuned for esports-grade flick aim.</div>
       </div>
       <div class="spec">
-        <div class="k">Battery</div>
-        <div class="v">120<span class="unit">hr</span></div>
-        <div class="desc">USB-C fast charging — full charge in under 30 minutes.</div>
+        <div class="k">Polling — wireless</div>
+        <div class="v">5000<span class="unit">Hz+</span></div>
+        <div class="desc">Sub-millisecond wireless reporting. 8 kHz over USB-C.</div>
+      </div>
+      <div class="spec">
+        <div class="k">Triggers</div>
+        <div class="v">HITS<span class="unit">tunable</span></div>
+        <div class="desc">Haptic Inductive Trigger System. User-tunable actuation force and ultra-low click latency.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ Section: Versus ═══════════════════════ -->
+  <section class="section" id="versus">
+    <div class="section-head">
+      <div class="section-num">(02) — Versus</div>
+      <h2 class="section-title">Against the <span class="serif">field.</span></h2>
+    </div>
+
+    <div class="vs-grid">
+      <div class="vs-card vs-self">
+        <div class="vs-tag mono">This unit</div>
+        <h3 class="vs-name">Logitech G — Pro&nbsp;X2 Superstrike</h3>
+        <ul class="vs-list mono">
+          <li><span>Sensor</span><b>Hero 2 · 44K DPI</b></li>
+          <li><span>Tracking</span><b>888 IPS · 88G</b></li>
+          <li><span>Polling</span><b>8 kHz wired · 5 kHz+ wireless</b></li>
+          <li><span>Mass</span><b>60–65 g</b></li>
+          <li><span>Triggers</span><b>HITS — tunable haptic</b></li>
+          <li><span>Software</span><b>G&nbsp;HUB</b></li>
+        </ul>
+      </div>
+      <div class="vs-card">
+        <div class="vs-tag mono">Competitor</div>
+        <h3 class="vs-name">Razer Viper V4 Pro</h3>
+        <ul class="vs-list mono">
+          <li><span>Sensor</span><b>Focus Pro 50K — Gen 3</b></li>
+          <li><span>Latency</span><b>0.36 ms motion</b></li>
+          <li><span>Polling</span><b>8 kHz wired &amp; wireless</b></li>
+          <li><span>Mass</span><b>≈ 49 g</b></li>
+          <li><span>Switches</span><b>Optical Gen 4</b></li>
+          <li><span>Scroll</span><b>Optical, refined</b></li>
+        </ul>
       </div>
     </div>
   </section>
@@ -981,8 +1041,8 @@
   <!-- ═══════════════════════ Section: Philosophy ═══════════════════════ -->
   <section class="section pull" id="philosophy">
     <div class="section-head">
-      <div class="section-num">(02) — Philosophy</div>
-      <h2 class="section-title">Every detail<br/><span class="serif">considered.</span></h2>
+      <div class="section-num">(03) — Philosophy</div>
+      <h2 class="section-title">Every gram<br/><span class="serif">considered.</span></h2>
     </div>
     <blockquote>
       Restraint is the highest form of design — every line that survived our review earned its place. <span class="serif">The ones that didn't were quietly removed.</span>
@@ -993,13 +1053,13 @@
   <!-- ═══════════════════════ Footer ═══════════════════════ -->
   <footer id="footer">
     <div class="lockup">
-      <div class="eyebrow mono">Reserve / Limited to 240 units</div>
+      <div class="eyebrow mono">Pre-order / Available 2026</div>
       <h2>
-        Get in <span class="serif">touch.</span>
+        Aim <span class="serif">true.</span>
       </h2>
       <div class="cta-row">
-        <a href="mailto:atelier@example.com" class="cta-big" data-magnetic>
-          atelier@example.com
+        <a href="https://www.logitechg.com" class="cta-big" data-magnetic>
+          logitechg.com / pre-order
           <svg class="arr" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         </a>
       </div>
@@ -1015,11 +1075,11 @@
           </ul>
         </div>
         <div class="col">
-          <h4>Atelier</h4>
+          <h4>Logitech G</h4>
           <ul>
-            <li><a href="#">Studio</a></li>
-            <li><a href="#">Process</a></li>
-            <li><a href="#">Manifesto</a></li>
+            <li><a href="#">G HUB</a></li>
+            <li><a href="#">Pro series</a></li>
+            <li><a href="#">Esports</a></li>
             <li><a href="#">Press</a></li>
           </ul>
         </div>
@@ -1033,19 +1093,19 @@
           </ul>
         </div>
         <div class="col">
-          <h4>Studio</h4>
+          <h4>Compatibility</h4>
           <ul>
-            <li>14 Rue de Sèvres</li>
-            <li>75007 Paris</li>
-            <li>By appointment</li>
-            <li>+33 1 42 22 00 00</li>
+            <li>Windows 10/11</li>
+            <li>macOS 12+</li>
+            <li>Lightspeed dongle</li>
+            <li>USB-C cable</li>
           </ul>
         </div>
       </div>
 
       <div class="baseline">
-        <div>© 2026 Atelier — All rights reserved</div>
-        <div>Crafted in Paris · ⓜ Series 01.A · Rev 2026.05</div>
+        <div>© 2026 Logitech — All rights reserved</div>
+        <div>Logitech G · Pro X2 Superstrike · Rev 2026</div>
       </div>
     </div>
   </footer>
