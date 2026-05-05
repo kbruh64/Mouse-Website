@@ -3,36 +3,34 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Atelier — Precision in motion</title>
+  <title>Atelier — Precision in Motion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ───────────────── Design tokens ───────────────── */
+    /* ════════════════════════════════════════════════════════════════════════
+       DESIGN TOKENS
+       ════════════════════════════════════════════════════════════════════════ */
     :root {
-      --bg:        #0a0a0c;
-      --bg-elev:   #0f0f12;
-      --fg:        #f4f4f5;
-      --fg-mute:   rgba(244,244,245,0.58);
-      --fg-dim:    rgba(244,244,245,0.36);
-      --fg-faint:  rgba(244,244,245,0.14);
-      --border:    rgba(255,255,255,0.07);
-      --accent:    #c5ff3d;   /* electric lime — fintech accent */
-      --accent-dim: rgba(197,255,61,0.18);
+      --bg:         #0a0a0c;
+      --bg-elev:    #0f0f12;
+      --bg-deeper:  #050507;
+      --fg:         #f4f4f5;
+      --fg-mute:    rgba(244,244,245,0.58);
+      --fg-dim:     rgba(244,244,245,0.36);
+      --fg-faint:   rgba(244,244,245,0.14);
+      --border:     rgba(255,255,255,0.07);
+      --border-str: rgba(255,255,255,0.14);
+      --accent:     #c5ff3d;
+      --accent-dim: rgba(197,255,61,0.16);
 
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-6: 24px;
-      --space-8: 32px;
-      --space-12: 48px;
-      --space-16: 64px;
-      --space-24: 96px;
-      --space-32: 128px;
+      --serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      --mono:  'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+      --sans:  'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-      --radius:  10px;
-      --easing:  cubic-bezier(0.22, 1, 0.36, 1);
+      --easing-default: cubic-bezier(0.22, 1, 0.36, 1);
+      --easing-sharp:   cubic-bezier(0.7, 0, 0.3, 1);
+      --easing-smooth:  cubic-bezier(0.65, 0, 0.05, 1);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +39,7 @@
     body {
       background: var(--bg);
       color: var(--fg);
-      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: var(--sans);
       font-feature-settings: 'ss01','cv11','ss03';
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -50,14 +48,94 @@
       letter-spacing: -0.011em;
     }
 
-    .mono {
-      font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
-      font-feature-settings: 'ss02','zero';
-    }
+    .mono { font-family: var(--mono); font-feature-settings: 'ss02','zero'; }
+    .serif { font-family: var(--serif); font-style: italic; font-weight: 400; }
 
     ::selection { background: var(--accent); color: #000; }
 
-    /* ── Top nav — fintech style ── */
+    /* ════════════════════════════════════════════════════════════════════════
+       FILM GRAIN OVERLAY
+       ════════════════════════════════════════════════════════════════════════ */
+    .grain {
+      position: fixed;
+      inset: -50%;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.05;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='1'/></svg>");
+      background-size: 200px 200px;
+      animation: grainShift 8s steps(8) infinite;
+    }
+    @keyframes grainShift {
+      0%   { transform: translate(0,0); }
+      10%  { transform: translate(-2%,-3%); }
+      25%  { transform: translate(3%,2%); }
+      50%  { transform: translate(-1%,4%); }
+      75%  { transform: translate(2%,-2%); }
+      100% { transform: translate(0,0); }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       PRELOADER
+       ════════════════════════════════════════════════════════════════════════ */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: var(--bg);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 var(--space-8, 32px) 32px;
+      transition: transform 1.1s var(--easing-smooth), opacity 0.4s linear 0.7s;
+    }
+    #preloader.done {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    #preloader .pl-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fg-mute);
+    }
+    #preloader .pl-counter {
+      font-size: clamp(8rem, 22vw, 20rem);
+      font-weight: 500;
+      line-height: 0.85;
+      letter-spacing: -0.06em;
+      color: var(--fg);
+      font-variant-numeric: tabular-nums;
+      display: flex;
+      align-items: baseline;
+      gap: 0.1em;
+    }
+    #preloader .pl-counter .pct {
+      font-size: 0.18em;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-weight: 500;
+      transform: translateY(-1.6em);
+    }
+    #preloader .pl-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--fg-faint);
+    }
+    #preloader .pl-bar i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.05s linear;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NAVIGATION
+       ════════════════════════════════════════════════════════════════════════ */
     #nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -65,66 +143,77 @@
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      padding: var(--space-6) var(--space-8);
+      padding: 24px 32px;
       pointer-events: none;
+      mix-blend-mode: difference;
     }
     #nav > * { pointer-events: auto; }
     #nav .brand {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
+      gap: 12px;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: -0.01em;
-      color: var(--fg);
+      color: #fff;
     }
     #nav .brand .mark {
       width: 22px; height: 22px;
       border-radius: 6px;
       background: var(--accent);
-      box-shadow: 0 0 0 1px rgba(197,255,61,0.3), 0 0 20px -2px rgba(197,255,61,0.4);
       position: relative;
     }
     #nav .brand .mark::after {
-      content:'';
-      position:absolute; inset:5px;
-      border-radius: 2px;
-      background: #000;
+      content:''; position:absolute; inset:5px;
+      border-radius: 2px; background: #000;
     }
     #nav .links {
       justify-self: center;
       display: flex;
-      gap: var(--space-8);
+      gap: 36px;
       font-size: 13px;
-      color: var(--fg-mute);
+      color: rgba(255,255,255,0.58);
       font-weight: 450;
     }
     #nav .links a {
       color: inherit;
       text-decoration: none;
-      transition: color 0.2s var(--easing);
+      transition: color 0.3s var(--easing-default);
+      position: relative;
     }
-    #nav .links a:hover { color: var(--fg); }
+    #nav .links a::after {
+      content:''; position:absolute;
+      left:0; bottom:-4px;
+      width:100%; height:1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.4s var(--easing-default);
+    }
+    #nav .links a:hover { color: #fff; }
+    #nav .links a:hover::after { transform: scaleX(1); transform-origin: left; }
     #nav .cta {
       justify-self: end;
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      padding: 8px 14px 8px 16px;
+      gap: 8px;
+      padding: 9px 14px 9px 18px;
       font-size: 12.5px;
       font-weight: 500;
       color: #000;
       background: var(--accent);
       border-radius: 100px;
       text-decoration: none;
-      transition: transform 0.25s var(--easing), box-shadow 0.25s var(--easing);
-      box-shadow: 0 0 0 1px rgba(197,255,61,0.4), 0 8px 24px -8px rgba(197,255,61,0.5);
+      transition: transform 0.4s var(--easing-default);
+      mix-blend-mode: normal;
     }
-    #nav .cta:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(197,255,61,0.6), 0 12px 32px -8px rgba(197,255,61,0.65); }
+    #nav .cta:hover { transform: translateY(-1px) scale(1.02); }
     #nav .cta .arr { width: 12px; height: 12px; }
 
-    /* ── Scroll architecture ── */
-    #scroll-spacer { height: 500vh; }
+    /* ════════════════════════════════════════════════════════════════════════
+       SCROLL ARCHITECTURE
+       ════════════════════════════════════════════════════════════════════════ */
+    #scroll-spacer { height: 500vh; position: relative; }
 
     #canvas-wrap {
       position: sticky;
@@ -133,7 +222,6 @@
       height: 100vh;
       overflow: hidden;
     }
-
     #canvas-wrap canvas {
       position: absolute;
       inset: 0;
@@ -141,7 +229,7 @@
       height: 100% !important;
     }
 
-    /* ── Ambient gradient — subtle, monochrome with cool bias ── */
+    /* Ambient gradient + grid */
     #ambient {
       position: absolute;
       inset: 0;
@@ -151,8 +239,6 @@
         radial-gradient(ellipse 70% 50% at 50% 0%,  rgba(255,255,255,0.045) 0%, transparent 60%),
         radial-gradient(ellipse 50% 35% at 50% 100%, rgba(120,170,255,0.04) 0%, transparent 70%);
     }
-
-    /* ── Subtle grid backdrop ── */
     #grid {
       position: absolute;
       inset: 0;
@@ -166,7 +252,24 @@
       -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 80%);
     }
 
-    /* ── Hero — asymmetric fintech layout ── */
+    /* Visible 12-column grid lines on hover-toggle (always visible faintly) */
+    .col-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      padding: 0 32px;
+    }
+    .col-grid > div {
+      border-left: 1px solid rgba(255,255,255,0.025);
+    }
+    .col-grid > div:last-child { border-right: 1px solid rgba(255,255,255,0.025); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       HERO
+       ════════════════════════════════════════════════════════════════════════ */
     #hero {
       position: absolute;
       inset: 0;
@@ -175,58 +278,70 @@
       will-change: opacity;
       display: flex;
       align-items: flex-end;
-      padding: 0 var(--space-12) var(--space-24);
+      padding: 0 32px 100px;
     }
     #hero-inner {
       width: 100%;
       max-width: 1480px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1.15fr 1fr;
       align-items: end;
-      gap: var(--space-8);
+      gap: 32px;
     }
 
-    #hero .eyebrow {
+    .eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-8);
+      gap: 8px;
+      margin-bottom: 32px;
       font-size: 11px;
       font-weight: 500;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--fg-mute);
     }
-    #hero .eyebrow::before {
+    .eyebrow::before {
       content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
+      width: 24px; height: 1px;
       background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
     }
 
     #hero h1 {
-      font-size: clamp(3rem, 9.5vw, 9rem);
+      font-size: clamp(3rem, 11vw, 11rem);
       font-weight: 500;
-      letter-spacing: -0.055em;
-      line-height: 0.92;
+      letter-spacing: -0.06em;
+      line-height: 0.88;
       color: var(--fg);
     }
     #hero h1 .accent {
+      font-family: var(--serif);
       font-style: italic;
       font-weight: 400;
       color: var(--accent);
-      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
       letter-spacing: -0.02em;
+    }
+
+    /* Reveal animation — words drift up on load */
+    .reveal-mask { display: inline-block; overflow: hidden; vertical-align: top; }
+    .reveal-mask > .reveal-inner {
+      display: inline-block;
+      transform: translateY(120%);
+      animation: reveal 1.2s var(--easing-smooth) forwards;
+    }
+    .reveal-mask:nth-child(2) > .reveal-inner { animation-delay: 0.08s; }
+    .reveal-mask:nth-child(3) > .reveal-inner { animation-delay: 0.16s; }
+    @keyframes reveal {
+      0%   { transform: translateY(120%); }
+      100% { transform: translateY(0); }
     }
 
     #hero .right-col {
       display: flex;
       flex-direction: column;
-      gap: var(--space-6);
+      gap: 28px;
       align-items: flex-start;
-      padding-bottom: var(--space-2);
+      padding-bottom: 12px;
     }
     #hero .sub {
       font-size: clamp(0.95rem, 1.15vw, 1.05rem);
@@ -237,47 +352,50 @@
       max-width: 380px;
     }
 
-    #hero .actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      pointer-events: auto;
-    }
-    #hero .btn-primary, #hero .btn-ghost {
+    .actions { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      padding: 13px 22px;
+      gap: 10px;
+      padding: 14px 24px;
       font-size: 13.5px;
       font-weight: 500;
       border-radius: 100px;
       text-decoration: none;
-      transition: transform 0.25s var(--easing), background 0.25s var(--easing);
+      transition: transform 0.3s var(--easing-default), background 0.3s var(--easing-default);
+      will-change: transform;
     }
-    #hero .btn-primary {
+    .btn-primary {
       color: #000;
       background: var(--accent);
-      box-shadow: 0 0 0 1px rgba(197,255,61,0.4), 0 12px 32px -10px rgba(197,255,61,0.55);
     }
-    #hero .btn-primary:hover { transform: translateY(-1px); }
-    #hero .btn-ghost {
+    .btn-primary::after {
+      content:''; width:16px; height:16px;
+      background: #000;
+      mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M3 9L9 3M9 3H4M9 3V8' stroke='currentColor' stroke-width='1.4' stroke-linecap='round'/></svg>") center/contain no-repeat;
+      -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'><path d='M3 9L9 3M9 3H4M9 3V8' stroke='currentColor' stroke-width='1.4' stroke-linecap='round'/></svg>") center/contain no-repeat;
+    }
+    .btn-ghost {
       color: var(--fg);
       background: transparent;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-str);
     }
-    #hero .btn-ghost:hover { background: rgba(255,255,255,0.04); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.05); }
 
-    /* Floating data badges — fintech metric callouts */
+    /* ════════════════════════════════════════════════════════════════════════
+       FLOATING BADGES
+       ════════════════════════════════════════════════════════════════════════ */
     .badge {
       position: absolute;
       z-index: 4;
-      padding: var(--space-3) var(--space-4);
+      padding: 14px 18px;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(15,15,18,0.72);
+      border-radius: 14px;
+      background: rgba(15,15,18,0.65);
       backdrop-filter: blur(20px) saturate(140%);
       -webkit-backdrop-filter: blur(20px) saturate(140%);
-      box-shadow: 0 18px 48px -16px rgba(0,0,0,0.6);
+      box-shadow: 0 18px 48px -16px rgba(0,0,0,0.7);
       pointer-events: none;
       will-change: transform;
     }
@@ -285,7 +403,7 @@
       display: block;
       font-size: 10px;
       font-weight: 500;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--fg-dim);
       margin-bottom: 6px;
@@ -300,25 +418,16 @@
       color: var(--fg);
       font-variant-numeric: tabular-nums;
     }
-    .badge .val .delta {
-      font-size: 11px;
-      color: var(--accent);
-      font-weight: 500;
-    }
-    .badge .val .unit {
-      font-size: 11px;
-      color: var(--fg-mute);
-      font-weight: 400;
-    }
-    #badge-1 { top: 18%;  left: 6%;  }
-    #badge-2 { top: 32%;  right: 7%; }
-    #badge-3 { bottom: 30%; left: 9%; }
+    .badge .val .delta { font-size: 11px; color: var(--accent); font-weight: 500; }
+    .badge .val .unit  { font-size: 11px; color: var(--fg-mute); font-weight: 400; }
+    #badge-1 { top: 22%; left: 5%; }
+    #badge-2 { top: 28%; right: 6%; }
+    #badge-3 { bottom: 32%; left: 8%; }
 
-    /* Corner brackets — fintech viewport markers */
+    /* Corner brackets */
     .bracket {
       position: absolute;
-      width: 28px;
-      height: 28px;
+      width: 32px; height: 32px;
       z-index: 3;
       border: 1px solid rgba(255,255,255,0.18);
       pointer-events: none;
@@ -328,19 +437,21 @@
     .br-bl { bottom: 24px; left: 24px; border-right: none; border-top: none; }
     .br-br { bottom: 24px; right: 24px; border-left: none; border-top: none; }
 
-    /* ── Scroll hint ── */
+    /* ════════════════════════════════════════════════════════════════════════
+       SCROLL HINT
+       ════════════════════════════════════════════════════════════════════════ */
     #scroll-hint {
       position: absolute;
-      bottom: var(--space-16);
+      bottom: 64px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 5;
       display: flex;
       align-items: center;
-      gap: var(--space-3);
+      gap: 14px;
       pointer-events: none;
       will-change: opacity;
-      transition: opacity 0.5s var(--easing);
+      transition: opacity 0.5s var(--easing-default);
     }
     #scroll-hint span {
       font-size: 10.5px;
@@ -350,178 +461,427 @@
       color: var(--fg-dim);
     }
     #scroll-hint .line {
-      width: 36px;
-      height: 1px;
+      width: 36px; height: 1px;
       background: linear-gradient(to right, transparent, var(--accent));
-      animation: lineAnim 2.2s var(--easing) infinite;
+      animation: lineAnim 2.2s var(--easing-default) infinite;
     }
     @keyframes lineAnim {
-      0%,100% { opacity:1; transform:scaleX(1); }
+      0%,100% { opacity:1;   transform:scaleX(1); }
       50%      { opacity:0.2; transform:scaleX(0.5); }
     }
 
-    /* ── Progress / scroll HUD (bottom strip) ── */
+    /* ════════════════════════════════════════════════════════════════════════
+       BOTTOM HUD
+       ════════════════════════════════════════════════════════════════════════ */
     #hud {
       position: fixed;
       bottom: 0; left: 0; right: 0;
       z-index: 200;
-      padding: var(--space-4) var(--space-8);
+      padding: 14px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-variant-numeric: tabular-nums;
       pointer-events: none;
       border-top: 1px solid var(--border);
-      background: linear-gradient(to top, rgba(10,10,12,0.65), transparent);
+      background: linear-gradient(to top, rgba(10,10,12,0.7), transparent);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
     #hud .meta {
-      display: flex;
-      gap: var(--space-8);
-      font-size: 11px;
-      color: var(--fg-dim);
+      display: flex; gap: 32px;
+      font-size: 11px; color: var(--fg-dim);
       letter-spacing: 0.04em;
     }
     #hud .meta b { color: var(--fg); font-weight: 500; }
     #hud .center {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      font-size: 11px;
-      color: var(--fg-mute);
-      font-weight: 500;
-      letter-spacing: 0.06em;
+      display: flex; align-items: center; gap: 14px;
+      font-size: 11px; color: var(--fg-mute);
+      font-weight: 500; letter-spacing: 0.06em;
     }
     #hud .track {
-      width: 220px;
-      height: 1px;
+      width: 220px; height: 1px;
       background: var(--fg-faint);
-      overflow: hidden;
-      position: relative;
+      overflow: hidden; position: relative;
     }
     #hud .fill {
       position:absolute; left:0; top:0; bottom:0;
-      width: 0%;
-      background: var(--accent);
+      width: 0%; background: var(--accent);
       transition: width 0.05s linear;
     }
     #hud .pct b { color: var(--fg); font-weight: 500; }
 
-    /* Top progress hairline */
     #progress {
       position: fixed;
       top: 0; left: 0;
-      height: 1px;
-      width: 0%;
+      height: 1px; width: 0%;
       background: var(--accent);
-      z-index: 200;
-      pointer-events: none;
-      box-shadow: 0 0 12px rgba(197,255,61,0.55);
+      z-index: 200; pointer-events: none;
     }
 
-    /* ── Custom cursor — monochrome, precise ── */
+    /* ════════════════════════════════════════════════════════════════════════
+       CURSOR — crosshair reticle
+       ════════════════════════════════════════════════════════════════════════ */
     #cur-dot {
       position: fixed;
-      width: 4px; height: 4px;
+      width: 3px; height: 3px;
       border-radius: 50%;
-      background: #fff;
+      background: var(--accent);
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%,-50%);
-      mix-blend-mode: difference;
     }
     #cur-ring {
       position: fixed;
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.35);
+      width: 22px; height: 22px;
       pointer-events: none;
       z-index: 9998;
       transform: translate(-50%,-50%);
-      mix-blend-mode: difference;
-      transition: width 0.25s var(--easing), height 0.25s var(--easing), border-color 0.25s var(--easing);
+      transition: width 0.22s var(--easing-default), height 0.22s var(--easing-default);
     }
-    body.clicking #cur-ring {
-      width: 52px; height: 52px;
-      border-color: rgba(255,255,255,0.85);
+    #cur-ring::before, #cur-ring::after {
+      content:''; position:absolute;
+      background: rgba(255,255,255,0.55);
     }
+    #cur-ring::before {
+      left:50%; top:0;
+      width:1px; height:6px;
+      transform: translateX(-50%);
+      box-shadow: 0 16px 0 rgba(255,255,255,0.55);
+    }
+    #cur-ring::after {
+      top:50%; left:0;
+      width:6px; height:1px;
+      transform: translateY(-50%);
+      box-shadow: 16px 0 0 rgba(255,255,255,0.55);
+    }
+    body.clicking #cur-ring { width: 32px; height: 32px; }
+    body.clicking #cur-ring::before { box-shadow: 0 26px 0 var(--accent); background: var(--accent); }
+    body.clicking #cur-ring::after  { box-shadow: 26px 0 0 var(--accent); background: var(--accent); }
 
-    /* ── Below section — Linear-style typography ── */
-    #below {
-      position: relative;
-      z-index: 5;
-      background: var(--bg);
-      padding: var(--space-32) var(--space-8);
-      max-width: 720px;
-      margin: 0 auto;
-      text-align: center;
+    /* ════════════════════════════════════════════════════════════════════════
+       MARQUEE — infinite text scroller
+       ════════════════════════════════════════════════════════════════════════ */
+    .marquee {
+      width: 100%;
+      overflow: hidden;
       border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      padding: 28px 0;
+      position: relative;
     }
-    #below .label {
+    .marquee-track {
+      display: flex;
+      gap: 64px;
+      animation: marquee 40s linear infinite;
+      width: max-content;
+      will-change: transform;
+    }
+    .marquee-track span {
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      color: var(--fg);
+      white-space: nowrap;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 11px;
+      gap: 64px;
+    }
+    .marquee-track span::after {
+      content: '';
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+    .marquee-track .serif {
+      color: var(--accent);
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+    }
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       AFTER-VIDEO SECTIONS
+       ════════════════════════════════════════════════════════════════════════ */
+    .section {
+      position: relative;
+      padding: 160px 32px;
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 96px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 12px;
       font-weight: 500;
+      letter-spacing: 0.16em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1;
+      color: var(--fg);
+    }
+    .section-title .serif {
+      color: var(--accent);
+    }
+
+    /* Spec grid */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .spec {
+      background: var(--bg);
+      padding: 36px 28px;
+      transition: background 0.4s var(--easing-default);
+    }
+    .spec:hover { background: var(--bg-elev); }
+    .spec .k {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-bottom: 24px;
+    }
+    .spec .v {
+      font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      color: var(--fg);
+      margin-bottom: 8px;
+    }
+    .spec .v .unit {
+      font-family: var(--mono);
+      font-size: 0.45em;
+      color: var(--fg-mute);
+      font-weight: 400;
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+    .spec .desc {
+      font-size: 12.5px;
+      color: var(--fg-mute);
+      line-height: 1.55;
+    }
+
+    /* Pull quote */
+    .pull {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .pull blockquote {
+      font-size: clamp(1.8rem, 4vw, 3.6rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1.05;
+      color: var(--fg);
+    }
+    .pull blockquote .serif { color: var(--accent); }
+    .pull cite {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 48px;
+      font-style: normal;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-mute);
+      font-family: var(--mono);
+    }
+    .pull cite::before {
+      content:''; width: 36px; height: 1px; background: var(--accent);
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       FOOTER — massive editorial CTA
+       ════════════════════════════════════════════════════════════════════════ */
+    #footer {
+      position: relative;
+      padding: 160px 32px 32px;
+      background: var(--bg-deeper);
+      border-top: 1px solid var(--border);
+      overflow: hidden;
+    }
+    #footer .lockup {
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+    #footer .lockup .eyebrow { margin-bottom: 64px; }
+    #footer h2 {
+      font-size: clamp(4rem, 16vw, 18rem);
+      font-weight: 500;
+      letter-spacing: -0.07em;
+      line-height: 0.82;
+      color: var(--fg);
+      margin-bottom: 64px;
+    }
+    #footer h2 .serif {
+      color: var(--accent);
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+    }
+    #footer .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding-bottom: 96px;
+      border-bottom: 1px solid var(--border);
+    }
+    #footer .cta-big {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 36px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #000;
+      background: var(--accent);
+      border-radius: 100px;
+      text-decoration: none;
+      transition: transform 0.4s var(--easing-default);
+    }
+    #footer .cta-big:hover { transform: translateY(-2px) scale(1.01); }
+    #footer .cta-big .arr {
+      width: 18px; height: 18px;
+    }
+    #footer .meta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 32px;
+      padding: 64px 0 32px;
+    }
+    #footer .col h4 {
+      font-family: var(--mono);
+      font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--fg-dim);
-      margin-bottom: var(--space-6);
+      margin-bottom: 24px;
+      font-weight: 500;
     }
-    #below .label::before {
-      content:''; width: 24px; height: 1px; background: var(--accent);
-    }
-    #below h2 {
-      font-size: clamp(1.8rem, 3.6vw, 2.8rem);
-      font-weight: 600;
-      letter-spacing: -0.035em;
-      line-height: 1.05;
-      color: var(--fg);
-      margin-bottom: var(--space-6);
-    }
-    #below p {
-      max-width: 520px;
-      margin: 0 auto;
+    #footer .col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    #footer .col a {
+      font-size: 14px;
       color: var(--fg-mute);
-      line-height: 1.6;
-      font-size: 16px;
-      letter-spacing: -0.005em;
+      text-decoration: none;
+      transition: color 0.3s var(--easing-default);
+    }
+    #footer .col a:hover { color: var(--fg); }
+    #footer .baseline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--fg-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      #hero-inner { grid-template-columns: 1fr; gap: 24px; }
+      #hero { padding: 0 20px 80px; }
+      .badge { display: none; }
+      #nav .links { display: none; }
+      .section-head { grid-template-columns: 1fr; }
+      .spec-grid { grid-template-columns: repeat(2, 1fr); }
+      #footer .meta-row { grid-template-columns: repeat(2, 1fr); }
+      #hud .meta { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ═══════════════════════ Preloader ═══════════════════════ -->
+  <div id="preloader">
+    <div class="pl-meta">
+      <div>Atelier / Series&nbsp;01</div>
+      <div style="margin-top:6px; opacity:0.55;">Initialising experience</div>
+    </div>
+    <div class="pl-counter mono">
+      <span id="pl-num">000</span><span class="pct">%</span>
+    </div>
+    <div class="pl-meta" style="text-align:right;">
+      <div>Loading assets</div>
+      <div style="margin-top:6px; opacity:0.55;" id="pl-stage">— video</div>
+    </div>
+    <div class="pl-bar"><i id="pl-bar-i"></i></div>
+  </div>
+
+  <!-- ═══════════════════════ Film grain ═══════════════════════ -->
+  <div class="grain"></div>
+
+  <!-- ═══════════════════════ Cursor + Progress ═══════════════════════ -->
   <div id="progress"></div>
   <div id="cur-dot"></div>
   <div id="cur-ring"></div>
 
+  <!-- ═══════════════════════ Nav ═══════════════════════ -->
   <nav id="nav">
     <div class="brand">
       <div class="mark"></div>
       <span>Atelier&nbsp;/&nbsp;Mouse</span>
     </div>
     <div class="links">
-      <a href="#">Product</a>
-      <a href="#">Engineering</a>
-      <a href="#">Specifications</a>
-      <a href="#">Journal</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#specifications">Specifications</a>
+      <a href="#philosophy">Philosophy</a>
+      <a href="#footer">Contact</a>
     </div>
-    <a href="#" class="cta">
+    <a href="#" class="cta" data-magnetic>
       Request access
       <svg class="arr" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
     </a>
   </nav>
 
+  <!-- ═══════════════════════ HUD ═══════════════════════ -->
   <div id="hud">
     <div class="meta mono"><span>LAT&nbsp;<b>48.8566°N</b></span><span>LON&nbsp;<b>2.3522°E</b></span></div>
     <div class="center mono"><span>FRAME</span><div class="track"><div class="fill" id="hud-fill"></div></div><span class="pct">[<b id="hud-pct">000</b>&nbsp;/&nbsp;100]</span></div>
     <div class="meta mono"><span>SERIES&nbsp;<b>01.A</b></span><span>REV&nbsp;<b>2026.05</b></span></div>
   </div>
 
+  <!-- ═══════════════════════ Sticky Three.js stage ═══════════════════════ -->
   <div id="scroll-spacer">
     <div id="canvas-wrap">
       <div id="grid"></div>
+      <div class="col-grid">
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
       <div id="ambient"></div>
 
       <div class="bracket br-tl"></div>
@@ -545,17 +905,17 @@
       <div id="hero">
         <div id="hero-inner">
           <div class="left-col">
-            <div class="eyebrow mono">Series 01 / Atelier Edition</div>
-            <h1>Precision<br/>in <span class="accent">motion</span>.</h1>
+            <div class="eyebrow mono">Series 01 — Atelier Edition</div>
+            <h1>
+              <span class="reveal-mask"><span class="reveal-inner">Precision</span></span><br/>
+              <span class="reveal-mask"><span class="reveal-inner">in&nbsp;<span class="accent">motion</span>.</span></span>
+            </h1>
           </div>
           <div class="right-col">
-            <p class="sub">A peripheral engineered around a single principle — the disappearance of itself. Scroll to disassemble the architecture.</p>
+            <p class="sub">A peripheral engineered around a single principle — the disappearance of itself. Every component refined to its essential geometry. Scroll to disassemble the architecture.</p>
             <div class="actions">
-              <a href="#" class="btn-primary">
-                Reserve unit
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              </a>
-              <a href="#" class="btn-ghost">Read the spec</a>
+              <a href="#" class="btn btn-primary" data-magnetic>Reserve unit</a>
+              <a href="#architecture" class="btn btn-ghost">Read the spec</a>
             </div>
           </div>
         </div>
@@ -569,12 +929,128 @@
     </div>
   </div>
 
-  <section id="below">
-    <div class="label mono">Section 02 — Philosophy</div>
-    <h2>Every detail considered.</h2>
-    <p>From the arc of the shell to the weight of the scroll wheel — every component is refined to feel like an extension of the hand.</p>
+  <!-- ═══════════════════════ Marquee ═══════════════════════ -->
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Engineered in Paris</span>
+      <span class="serif">Series 01</span>
+      <span>Titanium architecture</span>
+      <span class="serif">8kHz polling</span>
+      <span>0.4ms response</span>
+      <span class="serif">By appointment</span>
+      <span>Engineered in Paris</span>
+      <span class="serif">Series 01</span>
+      <span>Titanium architecture</span>
+      <span class="serif">8kHz polling</span>
+      <span>0.4ms response</span>
+      <span class="serif">By appointment</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ Section: Architecture ═══════════════════════ -->
+  <section class="section" id="architecture">
+    <div class="section-head">
+      <div class="section-num">(01) — Architecture</div>
+      <h2 class="section-title">Twenty-three components.<br/><span class="serif">Zero compromise.</span></h2>
+    </div>
+
+    <div class="spec-grid" id="specifications">
+      <div class="spec">
+        <div class="k">Polling rate</div>
+        <div class="v">8000<span class="unit">Hz</span></div>
+        <div class="desc">Wireless transmission tuned for esports-tier responsiveness.</div>
+      </div>
+      <div class="spec">
+        <div class="k">Sensor</div>
+        <div class="v">42K<span class="unit">DPI</span></div>
+        <div class="desc">Custom-tuned Pixart 3950 with 750 ips tracking.</div>
+      </div>
+      <div class="spec">
+        <div class="k">Mass</div>
+        <div class="v">58<span class="unit">g</span></div>
+        <div class="desc">Forged titanium chassis, machined from a single billet.</div>
+      </div>
+      <div class="spec">
+        <div class="k">Battery</div>
+        <div class="v">120<span class="unit">hr</span></div>
+        <div class="desc">USB-C fast charging — full charge in under 30 minutes.</div>
+      </div>
+    </div>
   </section>
 
+  <!-- ═══════════════════════ Section: Philosophy ═══════════════════════ -->
+  <section class="section pull" id="philosophy">
+    <div class="section-head">
+      <div class="section-num">(02) — Philosophy</div>
+      <h2 class="section-title">Every detail<br/><span class="serif">considered.</span></h2>
+    </div>
+    <blockquote>
+      Restraint is the highest form of design — every line that survived our review earned its place. <span class="serif">The ones that didn't were quietly removed.</span>
+    </blockquote>
+    <cite>Oren Vasquez — Lead Industrial Designer</cite>
+  </section>
+
+  <!-- ═══════════════════════ Footer ═══════════════════════ -->
+  <footer id="footer">
+    <div class="lockup">
+      <div class="eyebrow mono">Reserve / Limited to 240 units</div>
+      <h2>
+        Get in <span class="serif">touch.</span>
+      </h2>
+      <div class="cta-row">
+        <a href="mailto:atelier@example.com" class="cta-big" data-magnetic>
+          atelier@example.com
+          <svg class="arr" viewBox="0 0 12 12" fill="none"><path d="M3 9L9 3M9 3H4M9 3V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </a>
+      </div>
+
+      <div class="meta-row">
+        <div class="col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#">Series 01</a></li>
+            <li><a href="#">Specifications</a></li>
+            <li><a href="#">Compatibility</a></li>
+            <li><a href="#">Compare</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Atelier</h4>
+          <ul>
+            <li><a href="#">Studio</a></li>
+            <li><a href="#">Process</a></li>
+            <li><a href="#">Manifesto</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Owner's guide</a></li>
+            <li><a href="#">Warranty</a></li>
+            <li><a href="#">Service</a></li>
+            <li><a href="#">Returns</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Studio</h4>
+          <ul>
+            <li>14 Rue de Sèvres</li>
+            <li>75007 Paris</li>
+            <li>By appointment</li>
+            <li>+33 1 42 22 00 00</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="baseline">
+        <div>© 2026 Atelier — All rights reserved</div>
+        <div>Crafted in Paris · ⓜ Series 01.A · Rev 2026.05</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════ Three.js scene ═══════════════════════ -->
   <script type="importmap">
   {
     "imports": {
@@ -590,6 +1066,56 @@
     import { RenderPass }       from 'three/addons/postprocessing/RenderPass.js';
     import { UnrealBloomPass }  from 'three/addons/postprocessing/UnrealBloomPass.js';
     import { ShaderPass }       from 'three/addons/postprocessing/ShaderPass.js';
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  Preloader (fake progress with real video preload signal)
+    // ─────────────────────────────────────────────────────────────────────────
+    const preloader = document.getElementById('preloader');
+    const plNum     = document.getElementById('pl-num');
+    const plBar     = document.getElementById('pl-bar-i');
+    let plP = 0;
+    const plTick = setInterval(() => {
+      plP = Math.min(plP + 0.6 + Math.random() * 2.5, 99);
+      plNum.textContent = String(Math.floor(plP)).padStart(3,'0');
+      plBar.style.width = plP + '%';
+      if (plP >= 99) clearInterval(plTick);
+    }, 30);
+    function hidePreloader() {
+      plP = 100;
+      plNum.textContent = '100';
+      plBar.style.width = '100%';
+      setTimeout(() => preloader.classList.add('done'), 240);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  Magnetic CTA hover
+    // ─────────────────────────────────────────────────────────────────────────
+    document.querySelectorAll('[data-magnetic]').forEach(el => {
+      const strength = 0.35;
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top  + r.height / 2);
+        el.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+      });
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  Scroll-reveal on sections (intersection observer)
+    // ─────────────────────────────────────────────────────────────────────────
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.style.opacity = '1';
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section, .marquee').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 1.2s var(--easing-default)';
+      io.observe(el);
+    });
 
     // ─────────────────────────────────────────────────────────────────────────
     //  DOM
@@ -618,29 +1144,21 @@
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     wrap.appendChild(renderer.domElement);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Scene + Camera
-    // ─────────────────────────────────────────────────────────────────────────
     const scene  = new THREE.Scene();
-    scene.background = new THREE.Color(0x05050d);
+    scene.background = new THREE.Color(0x0a0a0c);
 
     const FOV    = 50;
     const camera = new THREE.PerspectiveCamera(FOV, W() / H(), 0.01, 100);
     camera.position.z = 2.4;
 
-    // Compute plane dimensions that fill screen height at z=0
     function frustumHeight(dist) {
       return 2 * Math.tan((FOV / 2) * Math.PI / 180) * dist;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Video
-    // ─────────────────────────────────────────────────────────────────────────
+    // Video
     const video = document.createElement('video');
-    video.src         = 'Mouse_rotation_exploded_202604202134.mp4';
-    video.muted       = true;
-    video.playsInline = true;
-    video.preload     = 'auto';
+    video.src = 'Mouse_rotation_exploded_202604202134.mp4';
+    video.muted = true; video.playsInline = true; video.preload = 'auto';
     video.load();
 
     const videoTex = new THREE.VideoTexture(video);
@@ -649,100 +1167,67 @@
     videoTex.magFilter       = THREE.LinearFilter;
     videoTex.generateMipmaps = false;
 
-    // Video shader — colour correct + vignette + luma-key alpha (makes near-black transparent)
     const videoMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTex:        { value: videoTex },
-        uExposure:   { value: 1.08 },
-        uSaturation: { value: 1.22 },
-        uVignette:   { value: 0.38 },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-        }
-      `,
+      uniforms: { uTex:{value:videoTex}, uExposure:{value:1.08}, uSaturation:{value:1.22}, uVignette:{value:0.38} },
+      vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `
-        uniform sampler2D uTex;
-        uniform float uExposure;
-        uniform float uSaturation;
-        uniform float uVignette;
-        varying vec2 vUv;
-
-        vec3 saturate(vec3 c, float s) {
-          float l = dot(c, vec3(0.2126,0.7152,0.0722));
-          return mix(vec3(l), c, s);
-        }
-
-        void main() {
+        uniform sampler2D uTex; uniform float uExposure, uSaturation, uVignette; varying vec2 vUv;
+        vec3 sat(vec3 c, float s){ float l=dot(c,vec3(0.2126,0.7152,0.0722)); return mix(vec3(l),c,s); }
+        void main(){
           vec4 c = texture2D(uTex, vUv);
           c.rgb *= uExposure;
-          c.rgb  = saturate(c.rgb, uSaturation);
-
-          // Vignette
-          vec2 uv2 = vUv * 2.0 - 1.0;
-          c.rgb *= clamp(1.0 - uVignette * dot(uv2,uv2), 0.0, 1.0);
-
-          // Fully opaque — no luma key so particles never bleed through the video
+          c.rgb  = sat(c.rgb, uSaturation);
+          vec2 uv2 = vUv*2.0 - 1.0;
+          c.rgb *= clamp(1.0 - uVignette*dot(uv2,uv2), 0.0, 1.0);
           gl_FragColor = vec4(c.rgb, 1.0);
-        }
-      `,
-      transparent: false,
-      depthWrite:  true,
+        }`,
+      transparent: false, depthWrite: true,
     });
 
     const planeH = frustumHeight(camera.position.z) * 0.92;
-    const planeW = planeH * (16 / 9);
-    const videoGeo  = new THREE.PlaneGeometry(planeW, planeH);
-    const videoMesh = new THREE.Mesh(videoGeo, videoMat);
-    videoMesh.position.z = -0.1;  // behind z=0 so front particles correctly occlude
+    const planeW = planeH * (16/9);
+    const videoMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), videoMat);
+    videoMesh.position.z = -0.1;
     scene.add(videoMesh);
 
     let videoDuration = 0;
-    video.addEventListener('loadedmetadata', () => { videoDuration = video.duration; });
+    video.addEventListener('loadedmetadata', () => {
+      videoDuration = video.duration;
+      hidePreloader();
+    });
+    // Fallback in case metadata never fires
+    setTimeout(hidePreloader, 3000);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Particles
-    // ─────────────────────────────────────────────────────────────────────────
-    const N      = 4200;
-    const pos    = new Float32Array(N * 3);
-    const rest   = new Float32Array(N * 3);
-    const vel    = new Float32Array(N * 3);
-    const aColor = new Float32Array(N * 3);
-    const aSize  = new Float32Array(N);
+    // Particles
+    const N = 4200;
+    const pos = new Float32Array(N*3), rest = new Float32Array(N*3), vel = new Float32Array(N*3);
+    const aColor = new Float32Array(N*3), aSize = new Float32Array(N);
 
     for (let i = 0; i < N; i++) {
-      const i3 = i * 3;
-
-      // Distribute in a flattened sphere with some spread past the edges
+      const i3 = i*3;
       const angle  = Math.random() * Math.PI * 2;
       const radius = Math.pow(Math.random(), 0.45) * 5.5;
       const x = radius * Math.cos(angle);
       const y = radius * Math.sin(angle) * 0.55;
       const z = (Math.random() - 0.5) * 2.8;
+      pos[i3]=rest[i3]=x; pos[i3+1]=rest[i3+1]=y; pos[i3+2]=rest[i3+2]=z;
 
-      pos[i3]  = rest[i3]  = x;
-      pos[i3+1] = rest[i3+1] = y;
-      pos[i3+2] = rest[i3+2] = z;
-
-      // Palette: vivid purple / ice blue / dim white
       const t = Math.random();
-      if (t < 0.38) {           // purple
-        aColor[i3]   = 0.50 + Math.random() * 0.35;
-        aColor[i3+1] = 0.15 + Math.random() * 0.20;
-        aColor[i3+2] = 0.90 + Math.random() * 0.10;
-      } else if (t < 0.70) {   // cyan-blue
-        aColor[i3]   = 0.05 + Math.random() * 0.20;
-        aColor[i3+1] = 0.55 + Math.random() * 0.35;
-        aColor[i3+2] = 0.90 + Math.random() * 0.10;
-      } else {                  // white/silver
-        const v = 0.65 + Math.random() * 0.35;
+      if (t < 0.55) {
+        // accent green tinted
+        aColor[i3]   = 0.65 + Math.random()*0.25;
+        aColor[i3+1] = 0.85 + Math.random()*0.15;
+        aColor[i3+2] = 0.30 + Math.random()*0.20;
+      } else if (t < 0.80) {
+        // cool white
+        const v = 0.85 + Math.random()*0.15;
+        aColor[i3] = aColor[i3+1] = aColor[i3+2] = v;
+      } else {
+        // dim grey
+        const v = 0.35 + Math.random()*0.20;
         aColor[i3] = aColor[i3+1] = aColor[i3+2] = v;
       }
-
-      aSize[i] = 1.2 + Math.random() * 3.0;
+      aSize[i] = 1.0 + Math.random() * 2.4;
     }
 
     const pGeo = new THREE.BufferGeometry();
@@ -753,117 +1238,69 @@
     pGeo.setAttribute('aSize',   new THREE.BufferAttribute(aSize, 1));
 
     const pMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uPR: { value: renderer.getPixelRatio() },
-      },
+      uniforms: { uPR: { value: renderer.getPixelRatio() } },
       vertexShader: `
-        attribute float aSize;
-        attribute vec3  aColor;
-        varying   vec3  vCol;
-        varying   float vAlpha;
-        uniform   float uPR;
+        attribute float aSize; attribute vec3 aColor;
+        varying vec3 vCol; varying float vAlpha;
+        uniform float uPR;
         void main() {
           vCol = aColor;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
-          float perspective = 260.0 / -mv.z;
-          gl_PointSize = aSize * uPR * perspective;
-          vAlpha = clamp((-mv.z - 0.2) / 3.0, 0.1, 1.0); // depth fade
+          gl_PointSize = aSize * uPR * (260.0 / -mv.z);
+          vAlpha = clamp((-mv.z - 0.2) / 3.0, 0.1, 1.0);
           gl_Position = projectionMatrix * mv;
-        }
-      `,
+        }`,
       fragmentShader: `
-        varying vec3  vCol;
-        varying float vAlpha;
+        varying vec3 vCol; varying float vAlpha;
         void main() {
           float d = length(gl_PointCoord - 0.5) * 2.0;
           float a = 1.0 - smoothstep(0.2, 1.0, d);
           if (a < 0.02) discard;
           gl_FragColor = vec4(vCol, a * vAlpha);
-        }
-      `,
-      transparent: true,
-      depthWrite:  false,
-      blending:    THREE.AdditiveBlending,
+        }`,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     });
 
-    const particles = new THREE.Points(pGeo, pMat);
-    scene.add(particles);
+    scene.add(new THREE.Points(pGeo, pMat));
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Post-processing
-    // ─────────────────────────────────────────────────────────────────────────
+    // Post-processing
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-
-    const bloom = new UnrealBloomPass(
-      new THREE.Vector2(W(), H()),
-      /*strength*/ 0.65,
-      /*radius*/   0.50,
-      /*threshold*/0.55   // only very bright particle cores bloom, not the video
-    );
+    const bloom = new UnrealBloomPass(new THREE.Vector2(W(), H()), 0.6, 0.5, 0.55);
     composer.addPass(bloom);
 
-    // Chromatic aberration (reactive to clicks / velocity)
-    const chromaShader = {
-      uniforms: { tDiffuse: { value: null }, uStr: { value: 0.0 } },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
-      `,
+    const chromaPass = new ShaderPass({
+      uniforms: { tDiffuse:{value:null}, uStr:{value:0} },
+      vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
       fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform float uStr;
-        varying vec2 vUv;
+        uniform sampler2D tDiffuse; uniform float uStr; varying vec2 vUv;
         void main() {
           vec2 off = (vUv - 0.5) * uStr;
           float r = texture2D(tDiffuse, vUv + off).r;
           float g = texture2D(tDiffuse, vUv).g;
           float b = texture2D(tDiffuse, vUv - off).b;
           gl_FragColor = vec4(r, g, b, 1.0);
-        }
-      `,
-    };
-    const chromaPass = new ShaderPass(chromaShader);
+        }`,
+    });
     composer.addPass(chromaPass);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  State
-    // ─────────────────────────────────────────────────────────────────────────
-
-    // Scroll
-    let scrollP    = 0;
-    let targetTime = 0;
-    let smoothTime = 0;
-    let lastSeek   = -1;
-
-    // Mouse world position
-    const mouseWorld = new THREE.Vector3(0, 0, 0);
-    const _ndc       = new THREE.Vector3();
-    const _dir       = new THREE.Vector3();
+    // State
+    let scrollP = 0, targetTime = 0, smoothTime = 0, lastSeek = -1;
+    const mouseWorld = new THREE.Vector3();
+    const _ndc = new THREE.Vector3(), _dir = new THREE.Vector3();
     let rawMouseX = 0, rawMouseY = 0;
-
-    // Tilt (smooth)
-    let tiltTargX = 0, tiltTargY = 0;
-    let tiltX = 0, tiltY = 0;
-
-    // Cursor DOM smooth position
+    let tiltTargX = 0, tiltTargY = 0, tiltX = 0, tiltY = 0;
     let cRingX = 0, cRingY = 0;
-
-    // Chromatic aberration state
-    let chromaStr    = 0;
-    let chromaTarget = 0;
-
-    // Ripple explosions
+    let chromaStr = 0, chromaTarget = 0;
     let ripples = [];
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Event listeners
-    // ─────────────────────────────────────────────────────────────────────────
-
-    // Scroll → video scrub
+    // Scroll
     window.addEventListener('scroll', () => {
+      const wrapTop = wrap.getBoundingClientRect().top + window.scrollY;
       const max = spacer.offsetHeight - window.innerHeight;
-      scrollP    = Math.max(0, Math.min(1, window.scrollY / max));
+      scrollP = Math.max(0, Math.min(1, (window.scrollY - wrapTop) / max + 1));
+      // Reset for cleanliness — based on overall spacer scroll
+      scrollP = Math.max(0, Math.min(1, window.scrollY / max));
       targetTime = scrollP * videoDuration;
       const pctVal = Math.round(scrollP * 100);
       progressBar.style.width = pctVal + '%';
@@ -871,129 +1308,77 @@
       hudPct.textContent = String(pctVal).padStart(3,'0');
     }, { passive: true });
 
-    // Mouse move — compute 3-D world position at z = 0 plane
+    // Mouse
     function unprojectMouse(cx, cy) {
       const rect = renderer.domElement.getBoundingClientRect();
-      const nx   = ((cx - rect.left)  / rect.width)  * 2 - 1;
-      const ny   = -((cy - rect.top) / rect.height) * 2 + 1;
+      const nx = ((cx - rect.left) / rect.width) * 2 - 1;
+      const ny = -((cy - rect.top) / rect.height) * 2 + 1;
       _ndc.set(nx, ny, 0.5).unproject(camera);
       _dir.copy(_ndc).sub(camera.position).normalize();
       const t = (0 - camera.position.z) / _dir.z;
       mouseWorld.copy(camera.position).addScaledVector(_dir, t);
-      // tilt: -1..1 normalised
-      tiltTargX =  nx;
-      tiltTargY =  ny;
+      tiltTargX = nx; tiltTargY = ny;
     }
-
     document.addEventListener('mousemove', (e) => {
-      rawMouseX = e.clientX;
-      rawMouseY = e.clientY;
+      rawMouseX = e.clientX; rawMouseY = e.clientY;
       unprojectMouse(e.clientX, e.clientY);
     });
 
-    // Click → ripple explosion + chroma spike
-    wrap.addEventListener('click', (e) => {
-      const mw = mouseWorld.clone();
-      ripples.push({ x: mw.x, y: mw.y, t: 0, str: 0.18 });
+    wrap.addEventListener('click', () => {
+      ripples.push({ x: mouseWorld.x, y: mouseWorld.y, t: 0, str: 0.18 });
       chromaTarget = 0.020;
       setTimeout(() => { chromaTarget = 0; }, 500);
     });
-
     document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
     document.addEventListener('mouseup',   () => document.body.classList.remove('clicking'));
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Helpers
-    // ─────────────────────────────────────────────────────────────────────────
     function lerp(a, b, t) { return a + (b - a) * t; }
 
-    // Physics constants
-    const SPRING     = 0.022;
-    const DAMPING    = 0.85;
-    const REPEL_R    = 1.35;
-    const REPEL_STR  = 0.11;
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Physics update
-    // ─────────────────────────────────────────────────────────────────────────
-    const mx = mouseWorld;
+    const SPRING = 0.022, DAMPING = 0.85, REPEL_R = 1.35, REPEL_STR = 0.11;
 
     function updatePhysics() {
-      const mwx = mx.x, mwy = mx.y;
-
-      // Process ripples
+      const mwx = mouseWorld.x, mwy = mouseWorld.y;
       for (let r = ripples.length - 1; r >= 0; r--) {
         const rip = ripples[r];
         rip.t += 0.035;
         if (rip.t >= 1) { ripples.splice(r, 1); continue; }
-        const ripRadius = rip.t * 4.5;
-        const decay     = Math.pow(1 - rip.t, 1.2);
-
+        const ripR = rip.t * 4.5, decay = Math.pow(1 - rip.t, 1.2);
         for (let i = 0; i < N; i++) {
-          const i3 = i * 3;
-          const dx = pos[i3]   - rip.x;
-          const dy = pos[i3+1] - rip.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) + 0.0001;
-          const ringDist = Math.abs(dist - ripRadius);
+          const i3 = i*3;
+          const dx = pos[i3] - rip.x, dy = pos[i3+1] - rip.y;
+          const dist = Math.sqrt(dx*dx + dy*dy) + 0.0001;
+          const ringDist = Math.abs(dist - ripR);
           if (ringDist < 0.7) {
-            const f = (1 - ringDist / 0.7) * rip.str * decay / dist;
-            vel[i3]   += dx * f;
-            vel[i3+1] += dy * f;
+            const f = (1 - ringDist/0.7) * rip.str * decay / dist;
+            vel[i3] += dx * f; vel[i3+1] += dy * f;
           }
         }
       }
-
-      // Per-particle spring + repel
       for (let i = 0; i < N; i++) {
-        const i3 = i * 3;
+        const i3 = i*3;
         let vx = vel[i3], vy = vel[i3+1], vz = vel[i3+2];
         const px = pos[i3], py = pos[i3+1], pz = pos[i3+2];
-
-        // Spring back to rest
-        vx += (rest[i3]   - px) * SPRING;
+        vx += (rest[i3] - px) * SPRING;
         vy += (rest[i3+1] - py) * SPRING;
         vz += (rest[i3+2] - pz) * SPRING * 0.6;
-
-        // Mouse repulsion (x/y plane)
-        const dx   = px - mwx;
-        const dy   = py - mwy;
-        const dist = Math.sqrt(dx * dx + dy * dy) + 0.0001;
+        const dx = px - mwx, dy = py - mwy;
+        const dist = Math.sqrt(dx*dx + dy*dy) + 0.0001;
         if (dist < REPEL_R) {
-          const f = (1 - dist / REPEL_R) * REPEL_STR;
-          vx += (dx / dist) * f;
-          vy += (dy / dist) * f;
+          const f = (1 - dist/REPEL_R) * REPEL_STR;
+          vx += (dx/dist) * f; vy += (dy/dist) * f;
         }
-
-        // Damping
-        vx *= DAMPING;
-        vy *= DAMPING;
-        vz *= DAMPING;
-
-        vel[i3]   = vx;
-        vel[i3+1] = vy;
-        vel[i3+2] = vz;
-
-        pos[i3]   = px + vx;
-        pos[i3+1] = py + vy;
-        pos[i3+2] = pz + vz;
+        vx *= DAMPING; vy *= DAMPING; vz *= DAMPING;
+        vel[i3] = vx; vel[i3+1] = vy; vel[i3+2] = vz;
+        pos[i3] = px+vx; pos[i3+1] = py+vy; pos[i3+2] = pz+vz;
       }
-
       posAttr.needsUpdate = true;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Render loop
-    // ─────────────────────────────────────────────────────────────────────────
-    const TILT_MAX  = 0.16;   // max rotation in radians (~9°)
-    const L_TILT    = 0.048;
-    const L_SEEK    = 0.085;
-    const L_RING    = 0.11;
-    const L_CHROMA  = 0.10;
+    const TILT_MAX = 0.16, L_TILT = 0.048, L_SEEK = 0.085, L_RING = 0.11, L_CHROMA = 0.10;
 
     function tick() {
       requestAnimationFrame(tick);
 
-      // ── Cursor ──
       curDot.style.left = rawMouseX + 'px';
       curDot.style.top  = rawMouseY + 'px';
       cRingX = lerp(cRingX, rawMouseX, L_RING);
@@ -1001,12 +1386,10 @@
       curRing.style.left = cRingX + 'px';
       curRing.style.top  = cRingY + 'px';
 
-      // ── UI opacity ──
       const p = scrollP;
-      hero.style.opacity       = p < 0.12 ? 1 : Math.max(0, 1 - (p - 0.12) / 0.13);
+      hero.style.opacity = p < 0.12 ? 1 : Math.max(0, 1 - (p - 0.12) / 0.13);
       scrollHint.style.opacity = p < 0.03 ? '1' : '0';
 
-      // ── Video scrub ──
       if (videoDuration > 0) {
         smoothTime = lerp(smoothTime, targetTime, L_SEEK);
         if (Math.abs(smoothTime - lastSeek) > 0.007) {
@@ -1016,52 +1399,39 @@
       }
       videoTex.needsUpdate = true;
 
-      // ── 3-D tilt of video + camera nudge ──
       tiltX = lerp(tiltX, tiltTargX * TILT_MAX, L_TILT);
       tiltY = lerp(tiltY, tiltTargY * TILT_MAX, L_TILT);
       videoMesh.rotation.y =  tiltX;
       videoMesh.rotation.x = -tiltY;
 
-      // Floating badges follow mouse with depth-varied parallax
       for (let i = 0; i < badges.length; i++) {
-        const b = badges[i];
-        if (!b) continue;
+        const b = badges[i]; if (!b) continue;
         const mx = badgeMul[i][0], my = badgeMul[i][1];
         b.style.transform = `translate3d(${tiltTargX * mx}px, ${tiltTargY * -my}px, 0)`;
       }
 
-      // Subtle camera parallax (much slower / smaller)
       camera.position.x = lerp(camera.position.x, tiltTargX * 0.06, 0.025);
       camera.position.y = lerp(camera.position.y, tiltTargY * 0.04, 0.025);
 
-      // ── Particle physics ──
       updatePhysics();
 
-      // ── Chromatic aberration ──
       chromaStr = lerp(chromaStr, chromaTarget, L_CHROMA);
       chromaPass.uniforms.uStr.value = chromaStr;
 
-      // ── Render via composer ──
       composer.render();
     }
-
     tick();
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Resize
-    // ─────────────────────────────────────────────────────────────────────────
     window.addEventListener('resize', () => {
       const w = W(), h = H();
       renderer.setSize(w, h);
       composer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-
       const ph = frustumHeight(camera.position.z) * 0.92;
-      const pw = ph * (16 / 9);
+      const pw = ph * (16/9);
       videoMesh.geometry.dispose();
       videoMesh.geometry = new THREE.PlaneGeometry(pw, ph);
-
       bloom.resolution.set(w, h);
       pMat.uniforms.uPR.value = renderer.getPixelRatio();
     });
